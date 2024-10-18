@@ -13,9 +13,12 @@ class ProjectController extends Controller
      */
     public function index()
     {
+        $projects = project::all();
+        
         
         return Inertia::render('Project/Index', [
             // 'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
+            'projects' => $projects,
             'status' => session('status'),
         ]);
     }
@@ -25,7 +28,8 @@ class ProjectController extends Controller
      */
     public function create()
     {
-        //
+        return Inertia::render('Project/Create', [
+        ]);
     }
 
     /**
@@ -33,23 +37,45 @@ class ProjectController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $projeto = new project([
+            "name"=>$request->name,
+            "description"=>$request->description
+        ]);
+        $projeto->save();
+
+        return to_route('project.index');
+
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(project $project)
+    public function show($id)
     {
-        //
+        $project = project::findOrFail($id);
+        // dd(json_encode($project));
+        
+        return Inertia::render('Project/Edit', [
+            // 'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
+            'project' =>$project,
+            "id"=>$id,
+            'status' => session('status'),
+        ]);
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(project $project)
+    public function edit($id , Request $request)
     {
-        //
+        $project = project::findOrFail($id);
+        
+        $project->name = $request['name'];
+        $project->description = $request['description'];
+      
+        $project->save();
+        return to_route('project.index');
+
     }
 
     /**
@@ -63,8 +89,11 @@ class ProjectController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(project $project)
+    public function destroy($id)
     {
-        //
+        $project = project::findOrFail($id);
+
+        $project->delete();
+        return to_route('project.index');
     }
 }
